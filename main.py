@@ -16,8 +16,14 @@ import taichi as ti
 import numpy as np
 import math
 
-# Inicializa Taichi com backend Metal (GPU do Macbook M4)
-ti.init(arch=ti.metal)
+# Inicializa Taichi com o melhor API Gráfica para a GPU em uso.
+try:
+    ti.init(arch=[ti.metal, ti.cuda, ti.vulkan])
+except RuntimeError:
+    # Se nenhuma GPU funcionar, cai de volta para a CPU
+    print("\n[Aviso] Nenhuma GPU compatível (CUDA, Vulkan, Metal) encontrada.")
+    print("Iniciando no backend de CPU (pode ser lento).")
+    ti.init(arch=ti.cpu)
 
 # Parâmetros da imagem (reduzido para performance em tempo real)
 WIDTH, HEIGHT = 1920, 1080
@@ -290,10 +296,10 @@ def render(t: ti.f32):
 
 def main():
     print("=" * 60)
-    print("🚀 RAY TRACING EM TEMPO REAL - GPU M4")
+    print("🚀 RAY TRACING EM TEMPO REAL - GPU")
     print("=" * 60)
     print(f"📐 Resolução: {WIDTH}x{HEIGHT}")
-    print(f"⚡ Backend: Metal (GPU Apple Silicon)")
+    print(f"✅ Taichi iniciado. Backend em uso: {ti.cfg.arch}")
     print()
     print("🎮 CONTROLES:")
     print("   W/S - Move câmera frente/trás")
